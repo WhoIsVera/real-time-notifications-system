@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @DataMongoTest  //Este nos indica que esta va estar enfocado a la capa de persitencia de datos usando MongoDB
-@ContextConfiguration(classes = {com.example.notificationservice.RealTimeNotificationsMicroserviceApplication.class}) // Asegura que se cargue la configuración del contexto
 class NotificationRepositoryTest {
     @Autowired
     private UserRepository userRepository;
