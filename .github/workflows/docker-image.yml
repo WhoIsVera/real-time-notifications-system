@@ -25,7 +25,7 @@ jobs:
       
     - name: Build the Docker image
       run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f real-time-notifications-microservice/
-src/Dockerfile .
+          src/Dockerfile .
 
       # Paso 4: Publicar la imagen en GitHub Container Registry
     - name: Push Docker image
