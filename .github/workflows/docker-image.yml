@@ -15,9 +15,11 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v4
 
-    # Paso 2: Compilar el proyecto con Maven para generar el archivo JAR
+    # Paso 2: Cambiar al directorio del proyecto y compilar con Maven
     - name: Build with Maven
-      run: mvn clean package
+      run: |
+        cd real-time-notifications-microservice
+        mvn clean package
     
     # Paso 3: Log in to GitHub Container Registry
     - name: Log in to Github Container Registry
