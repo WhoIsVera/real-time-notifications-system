@@ -24,7 +24,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN}}
       
     - name: Build the Docker image
-      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} .
+      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} scr/Dockerfile.
 
       # Paso 4: Publicar la imagen en GitHub Container Registry
     - name: Push Docker image
