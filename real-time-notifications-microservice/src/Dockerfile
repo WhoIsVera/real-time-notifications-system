@@ -7,5 +7,6 @@ VOLUME /tmp
 # Copiar el archivo JAR generado al contenedor
 COPY real-time-notifications-microservice/target/real-time-notifications-microservice-0.0.1-SNAPSHOT.jar app.jar
 
+
 # Establecer el comando de inicio del contenedor
 ENTRYPOINT ["java", "-jar", "/app.jar"]
