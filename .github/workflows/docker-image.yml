@@ -19,7 +19,7 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        distribution: 'temurin'  # Usar la distribución de OpenJDK (Eclipse Temurin)
+        distribution: 'temurin'
         java-version: '17'
 
     # Paso 3: Cambiar al directorio del proyecto y compilar con Maven
@@ -27,19 +27,27 @@ jobs:
       run: |
         cd real-time-notifications-microservice
         mvn clean package
-    
-    # Paso 4: Log in to GitHub Container Registry
+
+    # Paso 4: Capturar los reportes de surefire (pruebas fallidas)
+    - name: Upload Surefire Reports
+      if: failure()  # Solo si falla
+      uses: actions/upload-artifact@v3
+      with:
+        name: surefire-reports
+        path: real-time-notifications-microservice/target/surefire-reports
+
+    # Paso 5: Log in to GitHub Container Registry
     - name: Log in to Github Container Registry
       uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.actor }} 
         password: ${{ secrets.GITHUB_TOKEN }}
-      
-    # Paso 5: Construir la imagen Docker
+
+    # Paso 6: Construir la imagen Docker
     - name: Build the Docker image
       run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f Dockerfile .
 
-    # Paso 6: Publicar la imagen en GitHub Container Registry
+    # Paso 7: Publicar la imagen en GitHub Container Registry
     - name: Push Docker image
       run: docker push ghcr.io/whoisvera/my-app:${{ github.sha }}
