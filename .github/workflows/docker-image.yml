@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "FB-DEV-Feature-EVera" ]
+  pull_request:
+    branches: [ "FB-DEV-Feature-EVera" ]
+
+jobs:
+
+  build:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Github Container Regitry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }} 
+        password: ${{ secrets.GITHUB_TOKEN}}
+      
+    - name: Build the Docker image
+      run: docker build -t ghcr.io/${{ github.repository_owner }}/my-app:${{ github.sha }} .
+
+      # Paso 4: Publicar la imagen en GitHub Container Registry
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository_owner }}/my-app:${{ github.sha }}
