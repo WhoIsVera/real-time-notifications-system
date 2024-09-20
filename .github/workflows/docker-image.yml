@@ -64,3 +64,6 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+    # 3. Desactivar las pruebas y construir el JAR
+    - name: Build without tests
+      run: mvn clean package -DskipTests
