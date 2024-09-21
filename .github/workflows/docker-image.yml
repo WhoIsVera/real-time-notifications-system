@@ -45,7 +45,7 @@ jobs:
       working-directory: real-time-notifications-microservice  # Verifica si el archivo está presente
 
     - name: Build Docker image
-      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f src/Dockerfile .
+      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f real-time-notifications-microservice/src/Dockerfile .
       working-directory: real-time-notifications-microservice  # Cambia el contexto de Docker al directorio correcto
 
     - name: Push Docker image
