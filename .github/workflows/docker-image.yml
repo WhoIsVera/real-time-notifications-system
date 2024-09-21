@@ -36,16 +36,17 @@ jobs:
 
     - name: Build with Maven
       run: mvn clean package
-      working-directory: real-time-notifications-microservice
+      working-directory: real-time-notifications-microservice  # Establece el directorio correcto
       env:
         MONGO_URI: ${{ env.MONGO_URI }}
 
-    # Nuevo paso para verificar que el JAR se generó correctamente
     - name: List target directory
-      run: ls -al real-time-notifications-microservice/target
+      run: ls -al target
+      working-directory: real-time-notifications-microservice  # Verifica si el archivo está presente
 
     - name: Build Docker image
-      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f real-time-notifications-microservice/src/Dockerfile .
+      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} .
+      working-directory: real-time-notifications-microservice  # Cambia el contexto de Docker al directorio correcto
 
     - name: Push Docker image
       run: docker push ghcr.io/whoisvera/my-app:${{ github.sha }}
