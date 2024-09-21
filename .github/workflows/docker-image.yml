@@ -14,46 +14,44 @@ jobs:
       mongo:
         image: mongo:latest
         ports:
-        - 27017:27017
-
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ping: 1})'" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 3
+          
     steps:
-    # Paso 1: Checkout del repositorio
-    - name: Check out the repository
-      uses: actions/checkout@v4
+    - name: Check out repository
+      uses: actions/checkout@v2
 
-    # Paso 2: Configurar JDK 17
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # Paso 3: Cambiar al directorio del proyecto y compilar con Maven
+    - name: Set environment variables
+      run: echo "MONGO_URI=mongodb://localhost:27017/real-time-notifications" >> $GITHUB_ENV
+
     - name: Build with Maven
-      run: |
-        cd real-time-notifications-microservice
-        mvn clean package -e -X
+      run: mvn clean install
+      env:
+        MONGO_URI: ${{ env.MONGO_URI }}  # Pasa la variable MONGO_URI al proceso Maven
 
-    # Paso 4: Capturar los reportes de surefire (pruebas fallidas)
-    - name: Upload Surefire Reports
-      if: failure()  # Solo si falla
-      uses: actions/upload-artifact@v3
-      with:
-        name: surefire-reports
-        path: real-time-notifications-microservice/target/surefire-reports
+    - name: Run tests
+      run: mvn test
+      env:
+        MONGO_URI: ${{ env.MONGO_URI }}  # Pasa la variable MONGO_URI al proceso Maven
 
-    # Paso 5: Log in to GitHub Container Registry
-    - name: Log in to Github Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }} 
-        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build Docker image
+      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f real-time-notifications-microservice/src/Dockerfile .
 
-    # Paso 6: Construir la imagen Docker
-    - name: Build the Docker image
-      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f Dockerfile .
-
-    # Paso 7: Publicar la imagen en GitHub Container Registry
     - name: Push Docker image
       run: docker push ghcr.io/whoisvera/my-app:${{ github.sha }}
+
+    - name: Upload Surefire Reports
+      uses: actions/upload-artifact@v2
+      with:
+        name: surefire-reports
+        path: target/surefire-reports/
