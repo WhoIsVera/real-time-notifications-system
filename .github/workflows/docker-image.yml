@@ -26,7 +26,7 @@ jobs:
     - name: Build with Maven
       run: |
         cd real-time-notifications-microservice
-        mvn clean package -X
+        mvn clean package -e
 
     # Paso 4: Capturar los reportes de surefire (pruebas fallidas)
     - name: Upload Surefire Reports
