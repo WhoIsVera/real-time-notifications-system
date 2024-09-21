@@ -51,7 +51,7 @@ jobs:
       run: docker push ghcr.io/whoisvera/my-app:${{ github.sha }}
 
     - name: Upload Surefire Reports
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: surefire-reports
         path: target/surefire-reports/
