@@ -39,6 +39,8 @@ jobs:
       working-directory: real-time-notifications-microservice  # Establece el directorio correcto
       env:
         MONGO_URI: ${{ env.MONGO_URI }}  # Pasa la variable MONGO_URI al proceso Maven
+    - name: List target directory
+      run: ls -al real-time-notifications-microservice/target
 
     - name: Run tests
       run: mvn test
