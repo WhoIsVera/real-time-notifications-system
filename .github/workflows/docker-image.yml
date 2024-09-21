@@ -36,10 +36,11 @@ jobs:
 
     - name: Build with Maven
       run: mvn clean package
-      working-directory: real-time-notifications-microservice  # Asegúrate de que el POM está en este directorio
+      working-directory: real-time-notifications-microservice
       env:
         MONGO_URI: ${{ env.MONGO_URI }}
 
+    # Nuevo paso para verificar que el JAR se generó correctamente
     - name: List target directory
       run: ls -al real-time-notifications-microservice/target
 
