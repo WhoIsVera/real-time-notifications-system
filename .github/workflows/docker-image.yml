@@ -10,6 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+        - 27017:27017
+
     steps:
     # Paso 1: Checkout del repositorio
     - name: Check out the repository
