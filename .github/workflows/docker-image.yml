@@ -35,7 +35,9 @@ jobs:
       run: echo "MONGO_URI=mongodb://localhost:27017/real-time-notifications" >> $GITHUB_ENV
 
     - name: Build with Maven
-      run: mvn clean install
+      run: |
+        cd real-time-notifications-microservice
+        mvn clean install
       env:
         MONGO_URI: ${{ env.MONGO_URI }}  # Pasa la variable MONGO_URI al proceso Maven
 
