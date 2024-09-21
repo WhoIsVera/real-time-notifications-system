@@ -44,7 +44,7 @@ jobs:
       run: ls -al real-time-notifications-microservice/target
 
     - name: Build Docker image
-      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f real-time-notifications-microservice/Dockerfile .
+      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f real-time-notifications-microservice/src/Dockerfile .
 
     - name: Push Docker image
       run: docker push ghcr.io/whoisvera/my-app:${{ github.sha }}
