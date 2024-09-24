@@ -1,4 +1,5 @@
 name: Docker Image CI & Deploy to GKE
+
 on:
   push:
     branches: [ "FB-DEV-Feature-EVera" ]
@@ -67,9 +68,9 @@ jobs:
       with:
         name: surefire-reports
         path: real-time-notifications-microservice/target/surefire-reports/
-        
-    # Paso 10: Configurar Google Cloud SDK para GKE
-    - name: Set up Google Cloud SDK
+
+    # Paso 10: Autenticarse con Google Cloud
+    - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -83,18 +84,23 @@ jobs:
         location: ${{ secrets.GKE_ZONE }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-    # Paso 12: Desplegar la nueva imagen a GKE
+    # Paso 12: Aplicar el archivo deployment.yaml a GKE
+    - name: Apply deployment.yaml to GKE
+      run: |
+        kubectl apply -f path/to/your/deployment.yaml  # Cambia por la ruta de tu archivo deployment.yaml
+
+    # Paso 13: Desplegar la nueva imagen a GKE
     - name: Deploy to GKE
       run: |
         kubectl set image deployment/notification-service \
-        notification-service=ghcr.io/whoisvera/my-app:${{ github.sha }} --record
+        notification-service=ghcr.io/whoisvera/my-app:${{ github.sha }}
 
-    # Paso 13: Verificar el estado del despliegue en GKE
+    # Paso 14: Verificar el estado del despliegue en GKE
     - name: Check rollout status
       run: |
         kubectl rollout status deployment/notification-service
 
-    # Paso 14: Rollback si el despliegue falla
+    # Paso 15: Rollback si el despliegue falla
     - name: Rollback if deployment fails
       if: failure()
       run: |
