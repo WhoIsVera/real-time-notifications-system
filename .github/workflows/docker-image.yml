@@ -1,4 +1,4 @@
-  name: Docker Image CI & Deploy to GKE
+name: Docker Image CI & Deploy to GKE
 
 on:
   push:
