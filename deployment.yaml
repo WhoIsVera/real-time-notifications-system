@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    app: notification-service
+spec:
+  replicas: 2  # Número de réplicas que deseas
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+      - name: notification-service
+        image: ghcr.io/whoisvera/my-app:latest  # Imagen Docker a usar
+        ports:
+        - containerPort: 8080  # Puerto donde correrá la aplicación
+        env:
+        - name: MONGO_URI
+          value: "mongodb://localhost:27017/real-time-notifications"  # Variables de entorno
