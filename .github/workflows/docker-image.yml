@@ -73,7 +73,7 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GKE_CREDENTIALS }}
+        credentials_json: ${{ secrets.GKE_CREDENTIALS }}
 
     # Paso 11: Configurar kubectl para usar GKE
     - name: Set up kubectl for GKE
