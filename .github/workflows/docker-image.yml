@@ -1,5 +1,4 @@
 name: Docker Image CI & Deploy to GKE
-
 on:
   push:
     branches: [ "FB-DEV-Feature-EVera" ]
@@ -68,6 +67,7 @@ jobs:
       with:
         name: surefire-reports
         path: real-time-notifications-microservice/target/surefire-reports/
+        
     # Paso 10: Configurar Google Cloud SDK para GKE
     - name: Set up Google Cloud SDK
       uses: google-github-actions/auth@v1
