@@ -87,7 +87,7 @@ jobs:
     # Paso 12: Aplicar el archivo deployment.yaml a GKE
     - name: Apply deployment.yaml to GKE
       run: |
-        kubectl apply -f path/to/your/deployment.yaml  # Cambia por la ruta de tu archivo deployment.yaml
+        kubectl apply -f real-time-notifications-system/deployment.yaml
 
     # Paso 13: Desplegar la nueva imagen a GKE
     - name: Deploy to GKE
