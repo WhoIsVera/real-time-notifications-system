@@ -16,9 +16,31 @@ spec:
     spec:
       containers:
       - name: notification-service
-        image: ghcr.io/whoisvera/my-app:latest  # Imagen Docker a usar
+        image: ghcr.io/whoisvera/my-app:latest  # Imagen Docker a usar (pública)
         ports:
         - containerPort: 8080  # Puerto donde correrá la aplicación
         env:
         - name: MONGO_URI
-          value: "mongodb://localhost:27017/real-time-notifications"  # Variables de entorno
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: MONGO_URI
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
