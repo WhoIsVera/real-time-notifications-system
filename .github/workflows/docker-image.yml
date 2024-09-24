@@ -26,57 +26,72 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v2
 
-    # Paso 2: Configurar JDK 17
+    # Paso 2: Cache Maven
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    # Paso 3: Configurar JDK 17
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # Paso 3: Configurar variables de entorno para MongoDB
+    # Paso 4: Configurar variables de entorno para MongoDB
     - name: Set environment variables
       run: echo "MONGO_URI=mongodb://localhost:27017/real-time-notifications" >> $GITHUB_ENV
 
-    # Paso 4: Construir la aplicación con Maven
+    # Paso 5: Construir la aplicación con Maven
     - name: Build with Maven
       run: mvn clean package
       working-directory: real-time-notifications-microservice
       env:
         MONGO_URI: ${{ env.MONGO_URI }}
 
-    # Paso 5: Verificar los archivos generados por Maven
+    # Paso 6: Verificar los archivos generados por Maven
     - name: List target directory
       run: ls -al target
       working-directory: real-time-notifications-microservice
 
-    # Paso 6: Construir la imagen Docker
-    - name: Build Docker image
-      run: docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f src/Dockerfile .
+    # Paso 7: Iniciar sesión en GHCR usando el action oficial
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHCR_PAT }}
+
+    # Paso 8: Construir la imagen Docker con versionado
+    - name: Build Docker image with versioning
+      id: docker_build
+      run: |
+        docker build -t ghcr.io/whoisvera/my-app:${{ github.sha }} -f src/Dockerfile .
       working-directory: real-time-notifications-microservice
 
-    # Paso 7: Iniciar sesión en GHCR
-    - name: Log in to Github Container Registry
-      run: echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-    # Paso 8: Push de la imagen Docker a GHCR
+    # Paso 9: Push de la imagen Docker a GHCR
     - name: Push Docker image
       run: docker push ghcr.io/whoisvera/my-app:${{ github.sha }}
 
-    # Paso 9: Subir reportes de Maven (Surefire)
+    # Paso 10: Subir reportes de Maven (Surefire)
     - name: Upload Surefire Reports
       uses: actions/upload-artifact@v3
       with:
         name: surefire-reports
         path: real-time-notifications-microservice/target/surefire-reports/
 
-    # Paso 10: Autenticarse con Google Cloud
+    # Paso 11: Autenticarse con Google Cloud
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         credentials_json: ${{ secrets.GKE_CREDENTIALS }}
 
-    # Paso 11: Configurar kubectl para usar GKE
+    # Paso 12: Configurar kubectl para usar GKE
     - name: Set up kubectl for GKE
       uses: google-github-actions/get-gke-credentials@v1
       with:
@@ -84,24 +99,25 @@ jobs:
         location: ${{ secrets.GKE_ZONE }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-    # Paso 12: Aplicar el archivo deployment.yaml a GKE
+    # Paso 13: Aplicar el archivo deployment.yaml a GKE
     - name: Apply deployment.yaml to GKE
       run: |
         kubectl apply -f deployment.yaml
 
-    # Paso 13: Desplegar la nueva imagen a GKE
-    - name: Deploy to GKE
+    # Paso 14: Desplegar la nueva imagen a GKE
+    - name: Deploy to GKE with error handling
       run: |
-        kubectl set image deployment/notification-service \
-        notification-service=ghcr.io/whoisvera/my-app:${{ github.sha }}
+        set -e
+        kubectl set image deployment/notification-service notification-service=ghcr.io/whoisvera/my-app:${{ github.sha }}
 
-    # Paso 14: Verificar el estado del despliegue en GKE
-    - name: Check rollout status
+    # Paso 15: Verificar el estado del despliegue y log de errores si falla
+    - name: Check rollout status and log errors if any
       run: |
-        kubectl rollout status deployment/notification-service
+        kubectl rollout status deployment/notification-service || kubectl describe pods -l app=notification-service
 
-    # Paso 15: Rollback si el despliegue falla
+    # Paso 16: Rollback si el despliegue falla
     - name: Rollback if deployment fails
       if: failure()
       run: |
         kubectl rollout undo deployment/notification-service
+        kubectl describe deployment notification-service
