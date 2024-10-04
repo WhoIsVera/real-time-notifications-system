@@ -1,0 +1,269 @@
+openapi: 3.0.1
+info:
+  title: Real Time Notifications System
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Notifications
+  description: Operations related to Notifications in the notification system
+- name: Users
+  description: Operations related to User management in the notification system
+paths:
+  /api-clients/v1.0/users:
+    get:
+      tags:
+      - Users
+      summary: Get all users with their notifications
+      description: Retrieve a list of users along with their notifications
+      operationId: getAllUsers
+      responses:
+        "404":
+          description: No users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseListUser"
+        "200":
+          description: Successfully retrieved list of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    post:
+      tags:
+      - Users
+      summary: Save a new user
+      description: Create and save a new user in the system
+      operationId: saveUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "201":
+          description: User successfully saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "500":
+          description: Error saving the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseUser"
+  /api-clients/v1.0/notifications/users/{userId}:
+    get:
+      tags:
+      - Notifications
+      summary: Get user notifications
+      description: Retrieve a list of notifications for a specific user
+      operationId: getUserNotifications
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved notifications
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseListNotification"
+    post:
+      tags:
+      - Notifications
+      summary: Create a notification for a user
+      description: Create a new notification for a specific user
+      operationId: createNotification
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+        required: true
+      responses:
+        "201":
+          description: Notification successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseNotification"
+  /api-clients/v1.0/notifications/stream/{userId}:
+    get:
+      tags:
+      - Notifications
+      summary: Stream user notifications
+      description: Stream notifications for a specific user in real time
+      operationId: streamNotifications
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Streaming notifications
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/Notification"
+  /api-clients/v1.0/users/{id}:
+    delete:
+      tags:
+      - Users
+      summary: Delete a user by ID
+      description: Delete a user from the system by their ID
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseVoid"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseVoid"
+  /api-clients/v1.0/notifications/users/{userId}/notifications:
+    delete:
+      tags:
+      - Notifications
+      summary: Delete a user's notification
+      description: Delete a specific notification for a user
+      operationId: deleteNotification
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "404":
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseVoid"
+        "200":
+          description: Notification successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomApiResponseVoid"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        notifications:
+          type: array
+          items:
+            type: string
+    CustomApiResponseUser:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/User"
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        userReferenceId:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    CustomApiResponseNotification:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/Notification"
+    CustomApiResponseListUser:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+    CustomApiResponseListNotification:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+    CustomApiResponseVoid:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          type: object

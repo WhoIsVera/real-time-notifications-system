@@ -1,9 +1,7 @@
 package com.example.notificationservice.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "users")
+@Getter
+@Setter
 
 public class User {
     @Id
@@ -21,11 +21,12 @@ public class User {
 
     private String name;
     private String email;
+    private String password;
+    private String token;
+    private String refreshToken;
 
     private List<String> notifications = new ArrayList<>();
 
-
-    //List para notificaciones
 
 
 }

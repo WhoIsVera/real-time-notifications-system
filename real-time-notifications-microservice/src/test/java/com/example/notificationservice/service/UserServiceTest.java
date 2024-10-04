@@ -1,6 +1,8 @@
 package com.example.notificationservice.service;
 
+import com.example.notificationservice.entity.Notification;
 import com.example.notificationservice.entity.User;
+import com.example.notificationservice.repository.NotificationRepository;
 import com.example.notificationservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,17 +13,21 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @InjectMocks
     private UserService userService;
@@ -33,7 +39,7 @@ class UserServiceTest {
 
     @Test
     void testGetAllUsersWithNotificationMessages() {
-        // Crea datos de ejemplo
+        // Crea datos de ejemplo de usuarios
         User user1 = new User();
         user1.setId(UUID.randomUUID().toString());
         user1.setNotifications(Arrays.asList("notif1", "notif2"));
@@ -42,10 +48,18 @@ class UserServiceTest {
         user2.setId(UUID.randomUUID().toString());
         user2.setNotifications(Collections.emptyList());
 
-        // Simula el comportamiento del repositorio
+        // Crea datos de ejemplo de notificaciones
+        Notification notification1 = new Notification("notif1", user1.getId(), "Notification message 1", Instant.now(), false);
+        Notification notification2 = new Notification("notif2", user1.getId(), "Notification message 2", Instant.now(), false);
+
+        // Simula el comportamiento del repositorio de usuarios
         when(userRepository.findAll()).thenReturn(Flux.just(user1, user2));
 
-        // Ejecuta el metodo del servicio
+        // Simula el comportamiento del repositorio de notificaciones
+        when(notificationRepository.findByUserReferenceId(user1.getId())).thenReturn(Flux.just(notification1, notification2));
+        when(notificationRepository.findByUserReferenceId(user2.getId())).thenReturn(Flux.empty());
+
+        // Ejecuta el método del servicio
         Flux<User> result = userService.getAllUsersWithNotificationMessages();
 
         // Verifica el comportamiento esperado
@@ -54,6 +68,7 @@ class UserServiceTest {
                 .expectNext(user2)  // Se espera que devuelva el segundo usuario
                 .verifyComplete();
     }
+
 
     @Test
     void testSaveUser() {

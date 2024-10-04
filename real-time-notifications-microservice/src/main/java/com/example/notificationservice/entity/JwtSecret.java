@@ -1,30 +1,22 @@
 package com.example.notificationservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "notifications")
-public class Notification {
+@Document(collection = "jwtSecret")
+public class JwtSecret {
+
     @Id
     private String id;
+    private String secret;
 
-    private String userReferenceId;
-
-    private String message;
-
-    private Instant timestamp;
-
-    private boolean read;
-
+    public JwtSecret(String secret) {
+        this.secret = secret;
+    }
 }
-
-

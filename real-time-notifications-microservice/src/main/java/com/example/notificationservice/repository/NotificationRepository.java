@@ -11,5 +11,8 @@ public interface NotificationRepository extends ReactiveMongoRepository<Notifica
     // Devuelve todas las notificaciones para un usuario específico
     Flux<Notification> findByUserReferenceId(String userReferenceId);
 
-    Mono<Notification> findByMessage(String message);
+    //Devuelve todos los  userID o los mutiples userID que tienen el mismo mensaje
+    Flux<Notification> findByMessage(String message);
+
+    //Mono<Notification> findByMessage(String message);
 }
