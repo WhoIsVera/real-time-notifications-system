@@ -51,7 +51,7 @@ public class JwtUtil {
         });
     }
 
-    // Método ajustado para permitir establecer la duración del token
+    // Método para permitir establecer la duración del token
     public Mono<String> generateToken(String username, long durationMillis) {
         return getSecret().flatMap(secret -> {
             String token = Jwts.builder()
